@@ -164,12 +164,6 @@ function showHistory(taskId) {
             <div class="history-label">⚖️ Priority</div>
             <div class="history-value">${priorityEmoji} ${priorityText}</div>
         </div>
-        ${task.due ? `
-        <div class="history-item">
-            <div class="history-label">📅 Due Date</div>
-            <div class="history-value">${formatDateForDisplay(task.due)}</div>
-        </div>
-        ` : ''}
     `;
     
     modal.classList.add('active');
