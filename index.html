@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Straw Hat Ledger — One Piece</title>
+    
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+    
+    <!-- CSS -->
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+    <div class="app-container">
+
+        <!-- ===== HEADER - 10% ===== -->
+        <header class="header">
+            <div class="header-left">
+                <span class="logo-icon">🏴‍☠️</span>
+                <h1>Straw Hat Ledger</h1>
+                <span class="subtitle">Grand Line</span>
+            </div>
+            <div class="header-center"></div>
+            <div class="header-right">
+                <div class="flag-container">
+                    <div class="flag-pole"></div>
+                    <span class="flag">☠️</span>
+                </div>
+            </div>
+        </header>
+
+        <!-- Separator 1: Header to Body 1 -->
+        <div class="separator"></div>
+
+        <!-- ===== BODY 1 - 40% ===== -->
+        <div class="body-1">
+            <!-- Left: 40% -->
+            <div class="body-1-left">
+                <!-- Box 1: Date -->
+                <div class="info-box date-box">
+                    <div class="box-label">📅 Today's Date</div>
+                    <div class="box-content">
+                        <div class="date-main">
+                            <span class="date-day" id="dateDay">25</span>
+                            <span class="date-detail" id="dateDetail">December 2024</span>
+                        </div>
+                        <div style="font-size: clamp(10px, 0.7vw, 13px); color: var(--text-faint); margin-top: 2px;" id="dateDayName">Wednesday</div>
+                    </div>
+                </div>
+
+                <!-- Box 2: Total Work Hours -->
+                <div class="info-box hours-box">
+                    <div class="box-label">⏱️ Total Work Hours</div>
+                    <div class="box-content">
+                        <div class="hours-display">
+                            <span class="hours-main" id="workHoursDisplay">00:00:00</span>
+                            <span class="hours-label">today</span>
+                        </div>
+                        <div class="hours-controls">
+                            <button class="h-btn start-work" id="startWorkBtn">▶ Start Work</button>
+                            <button class="h-btn stop-work" id="stopWorkBtn" style="display:none;">⏹ Stop</button>
+                            <button class="h-btn reset-hours" id="resetHoursBtn">↺ Reset</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Box 3: Timer -->
+                <div class="info-box timer-box">
+                    <div class="box-label">⏳ Focus Timer</div>
+                    <div class="box-content">
+                        <div class="timer-display" id="timerDisplay">25:00</div>
+                        <div class="timer-controls">
+                            <button class="t-btn start" id="timerStart">Start</button>
+                            <button class="t-btn pause" id="timerPause" style="display:none;">Pause</button>
+                            <button class="t-btn reset" id="timerReset">Reset</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Right: 60% -->
+            <div class="body-1-right">
+                <!-- Task Input Box -->
+                <div class="task-input-box">
+                    <textarea id="taskInput" placeholder="⚓ What needs doing, Captain?" rows="3"></textarea>
+                </div>
+
+                <!-- Three Parallel Boxes -->
+                <div class="task-actions">
+                    <div class="action-box">
+                        <span class="action-icon">⚖️</span>
+                        <select id="prioritySelect">
+                            <option value="high">🔥 High</option>
+                            <option value="med" selected>⚖️ Medium</option>
+                            <option value="low">🍃 Low</option>
+                        </select>
+                    </div>
+                    <div class="action-box">
+                        <span class="action-icon">📅</span>
+                        <input type="date" id="dueInput">
+                    </div>
+                    <div class="action-box add-btn" id="addBtn">
+                        ➕ Add Task
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Separator 2: Body 1 to Body 2 -->
+        <div class="separator"></div>
+
+        <!-- ===== BODY 2 - 40% ===== -->
+        <div class="body-2">
+            <!-- Left: 47.5% - Pending Tasks -->
+            <div class="body-2-left">
+                <div class="list-header">
+                    <h3>⚔️ Pending Bounties</h3>
+                    <span class="list-count" id="pendingCount">0</span>
+                </div>
+                <div class="list-container" id="pendingList"></div>
+            </div>
+
+            <!-- Separator: 5% -->
+            <div class="body-2-separator">✦ ✦</div>
+
+            <!-- Right: 47.5% - Completed Tasks -->
+            <div class="body-2-right">
+                <div class="list-header">
+                    <h3>🏆 Collected Bounties</h3>
+                    <span class="list-count" id="completedCount">0</span>
+                </div>
+                <div class="list-container" id="completedList"></div>
+            </div>
+        </div>
+
+        <!-- Separator 3: Body 2 to Footer -->
+        <div class="separator"></div>
+
+        <!-- ===== FOOTER - 10% ===== -->
+        <footer class="footer">
+            <div class="footer-left">
+                <span class="heart">❤️</span> Grand Line Adventure
+            </div>
+            <div class="footer-center">
+                © 2024 Straw Hat Pirates
+            </div>
+            <div class="footer-right">
+                <span class="japanese">ワンピースは実在する</span>
+                <span class="flag-icon">🏴‍☠️</span>
+                <span style="font-size: clamp(10px, 0.7vw, 13px); color: var(--text-faint); font-weight: 400;">"One Piece is Real"</span>
+            </div>
+        </footer>
+
+    </div>
+
+    <!-- ===== HISTORY MODAL ===== -->
+    <div class="modal-overlay" id="historyModal">
+        <div class="modal-content">
+            <h2>📜 Task History</h2>
+            <div id="historyContent"></div>
+            <button class="modal-close" id="modalClose">Close</button>
+        </div>
+    </div>
+
+    <!-- ===== JAVASCRIPT FILES ===== -->
+    <script src="js/utils.js"></script>
+    <script src="js/tasks.js"></script>
+    <script src="js/timer.js"></script>
+    <script src="js/workHours.js"></script>
+    <script src="js/app.js"></script>
+    
+</body>
+</html>
