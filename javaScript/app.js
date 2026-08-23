@@ -1,145 +1,113 @@
-// ===== MAIN APPLICATION - STRAW HAT LEDGER =====
+// ===== MAIN APPLICATION =====
 
 document.addEventListener('DOMContentLoaded', function() {
-    
+
     // ===== DATE DISPLAY =====
     function updateDate() {
-        const now = new Date();
-        document.getElementById('dateDay').textContent = now.getDate();
-        document.getElementById('dateDetail').textContent = 
-            now.toLocaleDateString(undefined, { month: 'long', year: 'numeric' });
-        document.getElementById('dateDayName').textContent = 
-            now.toLocaleDateString(undefined, { weekday: 'long' });
+        const n = new Date();
+        document.getElementById('dayNum').textContent = n.getDate();
+        document.getElementById('dayName').textContent = n.toLocaleDateString(undefined, { weekday: 'long' });
+        document.getElementById('monthYear').textContent = n.toLocaleDateString(undefined, { month: 'short', year: 'numeric' });
     }
-    
-    // ===== CHECK FOR DATE CHANGE =====
-    function checkDateChange() {
-        const today = todayISO();
-        const saved = localStorage.getItem('ledger:lastDate');
-        if (saved && saved !== today) {
-            // Reset work hours for new day
-            workSeconds = 0;
-            updateWorkDisplay();
-            saveWorkHours();
-        }
-        localStorage.setItem('ledger:lastDate', today);
-    }
-    
-    // ===== SET DEFAULT DUE DATE =====
-    function setDefaultDueDate() {
-        document.getElementById('dueInput').value = todayISO();
-    }
-    
+    updateDate();
+
     // ===== EVENT LISTENERS =====
-    
-    // Add Task Button
     document.getElementById('addBtn').addEventListener('click', addTask);
-    
-    // Task Input - Enter key
+
     document.getElementById('taskInput').addEventListener('keydown', function(e) {
         if (e.key === 'Enter' && !e.shiftKey) {
             e.preventDefault();
             addTask();
         }
     });
-    
-    // Timer Controls
-    document.getElementById('timerStart').addEventListener('click', startTimer);
-    document.getElementById('timerPause').addEventListener('click', pauseTimer);
-    document.getElementById('timerReset').addEventListener('click', resetTimer);
-    
-    // Work Hours Controls
-    document.getElementById('startWorkBtn').addEventListener('click', startWork);
-    document.getElementById('stopWorkBtn').addEventListener('click', stopWork);
-    document.getElementById('resetHoursBtn').addEventListener('click', resetWorkHours);
-    
-    // Modal Controls
-    document.getElementById('modalClose').addEventListener('click', function() {
-        document.getElementById('historyModal').classList.remove('active');
-    });
-    
-    document.getElementById('historyModal').addEventListener('click', function(e) {
-        if (e.target === this) {
-            this.classList.remove('active');
+
+    document.getElementById('clearBtn').addEventListener('click', function() {
+        if (confirm('Clear all completed tasks?')) {
+            tasks = tasks.filter(x => !x.done);
+            saveTasks();
+            render();
         }
     });
-    
+
+    // Focus Timer
+    document.getElementById('focusStart').addEventListener('click', startFocus);
+    document.getElementById('focusPause').addEventListener('click', pauseFocus);
+    document.getElementById('focusReset').addEventListener('click', resetFocus);
+    document.getElementById('setTimerBtn').addEventListener('click', setCustomFocus);
+
+    document.querySelectorAll('#focusBox .presets button').forEach(function(b) {
+        b.addEventListener('click', function() {
+            setFocusPreset(parseInt(this.dataset.mins));
+        });
+    });
+
+    // Custom timer input - Enter key
+    document.getElementById('customMins').addEventListener('keydown', function(e) {
+        if (e.key === 'Enter') { e.preventDefault();
+            setCustomFocus(); }
+    });
+    document.getElementById('customSecs').addEventListener('keydown', function(e) {
+        if (e.key === 'Enter') { e.preventDefault();
+            setCustomFocus(); }
+    });
+
+    // Work Hours
+    document.getElementById('workStart').addEventListener('click', startWork);
+    document.getElementById('workStop').addEventListener('click', stopWork);
+    document.getElementById('workReset').addEventListener('click', resetWork);
+
+    // Modal
+    document.getElementById('modalClose').addEventListener('click', function() {
+        document.getElementById('historyModal').classList.remove('show');
+    });
+
+    document.getElementById('historyModal').addEventListener('click', function(e) {
+        if (e.target === this) this.classList.remove('show');
+    });
+
     // ===== KEYBOARD SHORTCUTS =====
     document.addEventListener('keydown', function(e) {
-        // Escape key to close modal
+        if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA' || e.target.tagName === 'SELECT') return;
+
+        if (e.key === ' ' || e.key === 'Space') {
+            e.preventDefault();
+            focusRunning ? pauseFocus() : startFocus();
+        }
+
+        if (e.key === 'r' || e.key === 'R') {
+            e.preventDefault();
+            resetFocus();
+        }
+
+        if ((e.ctrlKey || e.metaKey) && (e.key === 'w' || e.key === 'W')) {
+            e.preventDefault();
+            workRunning ? stopWork() : startWork();
+        }
+
         if (e.key === 'Escape') {
-            document.getElementById('historyModal').classList.remove('active');
-        }
-        
-        // Ctrl+Enter to add task
-        if (e.key === 'Enter' && (e.ctrlKey || e.metaKey)) {
-            const input = document.getElementById('taskInput');
-            if (document.activeElement === input) {
-                e.preventDefault();
-                addTask();
-            }
+            document.getElementById('historyModal').classList.remove('show');
         }
     });
-    
-    // ===== TASK LIST CLICK HANDLING (Event Delegation) =====
-    document.addEventListener('click', function(e) {
-        // Handle checkbox clicks
-        const checkbox = e.target.closest('.task-check');
-        if (checkbox) {
-            const id = checkbox.dataset.id;
-            if (id) {
-                toggleTask(id);
-            }
+
+    // ===== INIT =====
+    document.getElementById('dueInput').value = todayISO();
+    loadTasks();
+    loadWork();
+    updateFocusDisplay();
+
+    // Check date change every minute
+    setInterval(function() {
+        const today = todayISO();
+        const saved = localStorage.getItem('ledger:dateCheck');
+        if (saved && saved !== today) {
+            workSecs = 0;
+            updateWorkDisplay();
+            saveWork();
         }
-        
-        // Handle delete button clicks
-        const deleteBtn = e.target.closest('.task-delete');
-        if (deleteBtn) {
-            const id = deleteBtn.dataset.id;
-            if (id) {
-                deleteTask(id);
-            }
-        }
-        
-        // Handle completed task clicks (show history)
-        const taskItem = e.target.closest('.task-item.completed');
-        if (taskItem && !e.target.closest('.task-delete') && !e.target.closest('.task-check')) {
-            const id = taskItem.querySelector('.task-check')?.dataset.id;
-            if (id) {
-                showHistory(id);
-            }
-        }
-    });
-    
-    // ===== AUTO-SAVE WORK HOURS ON PAGE UNLOAD =====
-    window.addEventListener('beforeunload', function() {
-        if (workRunning) {
-            saveWorkHours();
-        }
-    });
-    
-    // ===== INITIALIZATION =====
-    function init() {
-        updateDate();
-        checkDateChange();
-        loadWorkHours();
-        updateTimerDisplay();
-        loadTasks();
-        setDefaultDueDate();
-        
-        // Update date every minute
-        setInterval(updateDate, 60000);
-        
-        // Check for date change every 30 seconds
-        setInterval(checkDateChange, 30000);
-        
-        // Log startup message
-        console.log('🏴‍☠️ Straw Hat Ledger initialized successfully!');
-        console.log('📅 Today:', todayISO());
-        console.log('📋 Total Tasks:', tasks.length);
-        console.log('⏱️ Work Hours:', workSeconds + ' seconds');
-    }
-    
-    // Start the application
-    init();
+        localStorage.setItem('ledger:dateCheck', today);
+    }, 60000);
+
+    // Update date display
+    setInterval(updateDate, 60000);
+
 });

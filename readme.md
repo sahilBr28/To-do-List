@@ -32,7 +32,7 @@ Straw Hat Ledger is a feature-rich task management application themed after the 
 
 ## 🚀 **Live Demo**
 
-[View Live Demo](#) *(Add your demo link here)*
+[View Live Demo]
 
 ---
 
